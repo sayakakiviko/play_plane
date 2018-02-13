@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="Author" content="">
+    <meta name="Keywords" content="关键词,字数限制在31字,用英文逗号或者空格隔开">
+    <meta name="Description" content="简介 描述信息,百度要求是80字内,标准是76个字">
+    <title>飞机大战</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft yahei", serif;
+        }
+
+        .clearfix:after {
+            content: "";
+            display: block;
+            clear: both;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        #box {
+            overflow: hidden;
+            position: relative;
+            width: 500px;
+            height: 760px;
+            margin: 20px auto;
+        }
+
+        /*菜单*/
+        #menu, #over {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            z-index: 1;
+            margin-left: -100px;
+            text-align: center;
+        }
+
+        #menu h1 {
+            margin-bottom: 50px;
+            color: #fff;
+        }
+
+        #menu p, #over p {
+            width: 220px;
+            background-color: #fff;
+            margin: 25px auto;
+            line-height: 30px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #menu p:hover, #over p:hover {
+            background-color: #fff8c8;
+        }
+
+        #plane {
+            position: relative;
+        }
+
+        #plane img {
+            cursor: pointer;
+        }
+
+        /*飞机的选择*/
+        #plane img:nth-child(1) {
+            width: 70px;
+            height: 70px;
+        }
+
+        #plane img:nth-child(2) {
+            width: 90px;
+            height: 70px;
+        }
+
+        #plane ul {
+            opacity: 0;
+            filter: alpha(opacity=0);
+            position: absolute;
+            top: 90px;
+            left: 0;
+            padding: 5px;
+            text-align: left;
+            border-radius: 5px;
+            transition: .5s;
+        }
+
+        #plane ul.pink {
+            opacity: 1;
+            filter: alpha(opacity=100);
+            top: 75px;
+            background-color: pink;
+            color: deeppink;
+        }
+
+        #plane ul.blue {
+            opacity: 1;
+            filter: alpha(opacity=100);
+            top: 75px;
+            background-color: #68d7fc;
+            color: blue;
+        }
+
+        #plane ul li:first-child {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        #plane ul li:last-child {
+            position: absolute;
+            top: -5px;
+            left: 55px;
+            border: 5px solid transparent;
+            border-top: none;
+            border-bottom-color: pink;
+        }
+
+        #plane ul.blue li:last-child {
+            left: 143px;
+            border-bottom-color: #68d7fc;
+        }
+
+        /*结束界面*/
+        #over {
+            display: none;
+            top: 50%;
+            margin-top: -126px;
+            margin-left: -126px;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, .5);
+            border: 1px solid pink;
+        }
+
+        #over h2 {
+            color: red;
+        }
+
+        #over h3 {
+            color: #fff;
+        }
+
+        /*地图*/
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("img/bg_1.jpg");
+        }
+
+        #box div.map1 {
+            background-image: url("img/bg_2.jpg");
+        }
+
+        #box div.map2 {
+            background-image: url("img/bg_3.jpg");
+        }
+
+        #box div.map3 {
+            background-image: url("img/bg_4.jpg");
+        }
+
+        #map img {
+            position: absolute;
+        }
+
+        #score {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /*敌机爆炸效果*/
+        #map img.boom {
+            opacity: 1;
+            animation: fade .8s forwards;
+        }
+
+        @keyframes fade {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /*我机爆炸效果*/
+        #map img.bling {
+            opacity: 1;
+            filter: alpha(opacity=100);
+            animation: bling 2s forwards;
+        }
+
+        @keyframes bling {
+            0% {
+                opacity: 1;
+            }
+            20% {
+                opacity: 0;
+            }
+            40% {
+                opacity: 1;
+            }
+            60% {
+                opacity: 0;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="box">
+    <div id="menu">
+        <h1>飞机大战 V.1.0</h1>
+        <p>简单</p>
+        <p>普通</p>
+        <p>困难</p>
+        <p style="color: red">疯狂模式</p>
+        <div id="plane">
+            <img src="img/plane_0.png" width="97" height="97" style="opacity: .5">
+            <img src="img/plane_1.png" width="122" height="95">
+            <ul>
+                <li>粉红精灵</li>
+                <li>技能：每获得一定分数会进入隐身状态，敌机无法攻击到它，持续7秒</li>
+                <li></li>
+            </ul>
+            <ul class="blue">
+                <li>碧蓝彗星</li>
+                <li>技能：每获得一定分数会进入无敌状态，撞击敌机可使其坠毁，持续5秒</li>
+                <li></li>
+            </ul>
+        </div>
+    </div>
+    <div id="over">
+        <h2>GAME OVER</h2>
+        <h3>分数：<span>0</span></h3>
+        <h3>成就：<span></span></h3>
+        <p>重新开始</p>
+        <p>返回菜单</p>
+    </div>
+    <p id="score">得分：<span>0</span></p>
+    <div id="map">
+        <div id="biu"></div>
+    </div>
+</div>
+
+<script>
+    window.requestAnimationFrame = window.requestAnimationFrame || function (fn) {
+        return setTimeout(fn, 1000 / 60)
+    };
+    window.cancelAnimationFrame = window.cancelAnimationFrame || clearTimeout;
+    var oBox = document.getElementById("box"),
+        oMenu = document.getElementById("menu"),//开始菜单
+        oOver = document.getElementById("over"),//结束菜单
+        oMap = document.getElementById("map"),//地图
+        oScoreBox = document.getElementById("score"),//分数父级
+        oScore = oScoreBox.children[0],//分数
+        oBiu = document.getElementById("biu"),//子弹父级
+        biuAll = oBiu.children,//所有子弹
+        aPlane = document.getElementById("plane").getElementsByTagName("img"),//选择飞机
+        mapWidth = oMap.clientWidth,
+        mapHeight = oMap.clientHeight,
+        boxLeft = oBox.offsetLeft,
+        boxTop = oBox.offsetTop, halfW, halfH;//飞机的一半宽，一半高
+
+    exe();
+
+    /*游戏启动*/
+    function exe() {
+        var aUl = document.getElementById("plane").getElementsByTagName("ul"), //飞机的描述
+            index = 1;
+        //选择飞机
+        for (var i = 0; i < 2; i++) {
+            aPlane[i].i = i;
+            aPlane[i].onclick = function () {
+                //取消之前被选中飞机的样式
+                aPlane[index].style.opacity = ".5";
+                aUl[index].className = "";
+                index = this.i;
+                //给选中的飞机加样式
+                aPlane[index].style.opacity = "1";
+                aUl[index].className = index ? "blue" : "pink";
+            };
+        }
+        //选择难度
+        var aP = oMenu.getElementsByTagName("p");
+        for (var i = 0, length = aP.length; i < length; i++) {
+            (function (i) {
+                aP[i].onclick = function (e) {
+                    e = e || window;
+                    startGame(i, {
+                        x: e.clientX - boxLeft,
+                        y: e.clientY - boxTop
+                    });//开始游戏。序号，鼠标位置
+                }
+            })(i);
+        }
+    }
+
+    /*游戏开始。参数：难度，鼠标位置*/
+    function startGame(level, axis) {
+        oScoreBox.score = 0;//得分清零
+        oScore.innerHTML = oScoreBox.score;
+        oScoreBox.style.display = "block";//显示分数
+        oMenu.style.display = "none";//隐藏菜单
+        var plane = choosePlane(axis);//生成我方飞机
+        mapScroll(level);//生成地图
+        fire(level, plane);//生成子弹
+        enemy(level, plane);//生成敌机
+    }
+
+    /*显示对应难度的地图并滚动。参数：难度*/
+    function mapScroll(level) {
+        oMap.className = "map" + level;//显示对应难度地图
+        (function m() {
+            oMap.scroll = oMap.scroll || 0;
+            oMap.scroll++;
+            oMap.style.backgroundPositionY = oMap.scroll + 'px';
+            oMap.timer = requestAnimationFrame(m);
+        })();
+    }
+
+    /*生成我方飞机。参数：鼠标位置*/
+    function choosePlane(axis) {
+        //生成我方飞机
+        var plane = document.createElement("img");
+        if (aPlane[0].style.opacity < 1) {//选了第二个飞机，默认也是第二个飞机
+            plane.src = "img/plane_1.png";
+            plane.width = 90;
+            plane.height = 70;
+            plane.mark = 1;//给选择的是哪个飞机做标记来区别
+        } else {
+            plane.src = "img/plane_0.png";
+            plane.width = 70;
+            plane.height = 70;
+            plane.mark = 0;//给选择的是哪个飞机做标记来区别
+        }
+        halfW = plane.width / 2;//飞机一半的宽
+        halfH = plane.height / 2;//一半的高
+        plane.style.left = axis.x - halfW + "px";//我方飞机生成位置
+        plane.style.top = axis.y - halfH + "px";//我方飞机生成位置
+        oMap.appendChild(plane);
+        //取消点击，以防出现bug
+        document.onmousedown = function (e) {
+            e = e || window.event;
+            e.cancelBubble = true;
+            return false;
+        };
+        //移动飞机
+        document.onmousemove = function (e) {
+            e = e || window.event;
+            var left = e.clientX - boxLeft - halfW,
+                top = e.clientY - boxTop - halfH;
+            left = Math.max(left, -plane.width / 2);//限定左边边界
+            left = Math.min(left, oMap.clientWidth - halfW);//右边
+            top = Math.max(top, 0);//顶部
+            top = Math.min(top, mapHeight - halfH);//底部
+            plane.style.left = left + "px";//飞机位置
+            plane.style.top = top + "px";//飞机位置
+            //飞机状态恢复
+            if (plane.style.opacity < 1) {
+                setTimeout(function () {
+                    plane.style.opacity = "1";
+                }, 7000);
+            }
+            if (plane.width > 100) {
+                setTimeout(function () {
+                    plane.width = 90;
+                    plane.height = 70;
+                }, 5000);
+            }
+        };
+        return plane;
+    }
+
+    /*生成子弹。参数：难度，我方飞机*/
+    function fire(i, plane) {
+        oBox.fire = setInterval(function () {
+            if (oScoreBox.score >= 50) {
+                biu(true, -1);
+                biu(true, 1);
+            } else {
+                biu();
+            }
+        }, [150, 200, 250, 50][i]);//根据序号也就是难度决定子弹生成的间隔
+        function biu(bool, d) {//双行子弹时才有参数
+            var biu = document.createElement("img");
+            biu.src = "img/fire.png";
+            biu.width = 25;
+            biu.height = 30;
+            var left = plane.offsetLeft + plane.width / 2 - biu.width / 2;
+            //双行子弹的处理
+            if (bool) {
+                left += biu.width * d;
+            }
+            biu.style.left = left + "px";//子弹位置
+            biu.style.top = plane.offsetTop - biu.height + "px";//子弹位置
+            oBiu.appendChild(biu);
+
+            //子弹的飞行
+            function move() {
+                var top = biu.offsetTop - 10;//子弹飞行速度
+                if (top < -biu.height) {//若子弹已经飞出地图
+                    oBiu.removeChild(biu);//删除该子弹
+                } else {
+                    biu.style.top = top + "px";
+                    requestAnimationFrame(move);
+                }
+            }
+
+            //将运动执行队列放后面，不然子弹会直接初始就在 子弹飞行速度 的位置而非生成子弹的位置
+            setTimeout(function () {
+                requestAnimationFrame(move);
+            }, 50);
+        }
+    }
+
+    /*生成敌方飞机。参数：难度，我方飞机*/
+    function enemy(levle, plane) {
+        var num = 1,//敌军生成计数
+            before = 0,
+            bool = false,
+            speed = [4, 5, 5, 6][levle];//敌机飞行基础速度
+        oBox.enemy = setInterval(function () {
+            var index = num % 30 ? 1 : 0;//每生成30个敌机生成一个小BOSS
+            var foe = new Image();
+            foe.src = "img/enemy_" + ["big", "small"][index] + ".png";
+            foe.mark = index;//敌机编号，BOSS编号为0
+            foe.HP = [[10, 12, 13, 20][levle], 1][index];//敌机血量
+            foe.speed = speed + (Math.random() * 0.6 - 0.3) * speed;//敌机速度，可能快或者慢30%区间浮动
+            foe.speed *= index ? 1 : 0.5;//BOSS速度慢50%
+            foe.width = [104, 54][index];
+            foe.height = [80, 40][index];
+            var left = Math.floor(Math.random() * mapWidth) - foe.width;//随机生成敌机且不能超出地图左右
+            left = Math.max(left, 0);//限定左边边界
+            left = Math.min(left, mapWidth);//右边
+            foe.style.left = left + "px";
+            foe.style.top = -foe.height + "px";
+            num++;
+            oMap.appendChild(foe);
+
+            //敌机的飞行
+            function move() {
+                var top = foe.offsetTop + foe.speed;//敌机飞行速度，不同难度速度不同
+                if (top > mapHeight) {//若敌机已经飞出地图
+                    oScoreBox.score--;//漏掉一个敌机减一分
+                    oScore.innerHTML = oScoreBox.score;
+                    oMap.removeChild(foe);//删除该敌机
+                } else {
+                    foe.style.top = top + "px";
+                    //敌机与子弹相撞
+                    for (var i = biuAll.length - 1; i >= 0; i--) {//倒序遍历，以防出现跳过
+                        var objBiu = biuAll[i];
+                        if (coll(foe, objBiu)) {//如果子弹击中敌机
+                            oBiu.removeChild(objBiu);//移除子弹
+                            foe.HP--;
+                            if (!foe.HP) {//若敌机血条为0
+                                boom(foe.width, foe.height, foe.offsetLeft, foe.offsetTop, 0, foe.mark);//敌机爆炸
+                                foe.parentNode && oMap.removeChild(foe);//移除敌机
+                                before = oScoreBox.score;//存入上一次分数
+                                oScoreBox.score += index ? 2 : 20;//加分策略
+                                oScore.innerHTML = oScoreBox.score;
+
+                                //针对于跳分的处理
+                                if (before < 100 && before % 100 && oScoreBox.score > before && oScoreBox.score > 100 && oScoreBox.score % 100) {
+                                    bool = true;
+                                    //console.log(true);
+                                }
+                                //每获得50分使用技能
+                                if (!(oScoreBox.score % 100) || bool) {
+                                    if (plane.mark) {
+                                        plane.width = 122;
+                                        plane.height = 95;
+                                        bool = false;
+                                    } else {
+                                        plane.style.opacity = ".5";
+                                        bool = false;
+                                    }
+                                    console.log(oScoreBox.score);
+                                }
+                                //score(plane);//分数和飞机状态的变化
+                                return;
+                            }
+                        }
+                    }
+                    //敌机与我方飞机相撞
+                    if (plane.style.opacity < 1) {//飞机正处于隐身状态
+                        //不做撞击判定
+                    } else if (plane.parentNode && coll(foe, plane) && plane.width > 100) {//飞机正处于无敌状态可撞击敌机
+                        boom(foe.width, foe.height, foe.offsetLeft, foe.offsetTop, 0, foe.mark);//敌机爆炸
+                        oMap.removeChild(foe);//移除敌机
+                        return;
+                    } else if (plane.parentNode && coll(foe, plane)) {//如果我方飞机存在且与敌机相撞
+                        boom(foe.width, foe.height, foe.offsetLeft, foe.offsetTop, 0, foe.mark);//敌机爆炸
+                        boom(plane.width, plane.height, plane.offsetLeft, plane.offsetTop, 1, plane.mark);//我方飞机爆炸
+                        oMap.removeChild(foe);//移除敌机
+                        oMap.removeChild(plane);//移除我方飞机
+                        gameOver(levle, oScoreBox.score);//游戏结束界面
+                        return;
+                    }
+                    requestAnimationFrame(move);
+                }
+            }
+
+            requestAnimationFrame(move);//预先启动
+        }, [500, 400, 300, 50][levle]);//根据序号也就是难度决定敌机生成的间隔
+    }
+
+    /*分数与相应奖励。参数：我方飞机*/
+    function score(plane) {
+        oScoreBox.score++;//计分
+        //oOver.s = oOver.score + oOver.score;
+        /*if (oScoreBox.score === 10) {
+            if (plane.mark) {
+                plane.width = 122;
+                plane.height = 95;
+            } else {
+                plane.style.opacity = ".5";
+            }
+        }*/
+        oScore.innerText = oScoreBox.score;//显示得分
+    }
+
+    /*相撞判断。参数：两个相撞的对象*/
+    function coll(obj1, obj2) {
+        var t1 = obj1.offsetTop,
+            b1 = obj1.offsetTop + obj1.clientHeight,
+            l1 = obj1.offsetLeft,
+            r1 = obj1.offsetLeft + obj1.clientWidth,
+            t2 = obj2.offsetTop,
+            b2 = obj2.offsetTop + obj2.clientHeight,
+            l2 = obj2.offsetLeft,
+            r2 = obj2.offsetLeft + obj2.clientWidth;
+        return !(b1 < t2 || r1 < l2 || t1 > b2 || l1 > r2);
+    }
+
+    /*爆炸效果。参数：爆炸飞机的宽，爆炸飞机的高，爆炸飞机的offsetLeft，爆炸飞机的offsetTop，爆炸的是敌机还是我机(敌机0我机1)，爆炸的飞机编号*/
+    function boom(w, h, l, t, i, mark) {
+        var oBoom = new Image();//创建爆炸图
+        oBoom.src = "img/" + [["boom_big", "boom_small"][mark], ["plane_0", "plane_1"][mark]][i] + ".png";//根据i判断是敌机还是我机爆炸，根据mark判断是哪个飞机爆炸
+        oBoom.className = ["boom", "bling"][i];
+        oBoom.width = w;//[[64, 54][mark], [70, 90][mark]][i];
+        oBoom.height = h;//[[64, 40][mark], [70, 70][mark]][i];
+        oBoom.style.left = l + "px";
+        oBoom.style.top = t + "px";
+        oMap.appendChild(oBoom);
+        setTimeout(function () {
+            oBoom.parentNode && oMap.removeChild(oBoom);
+        }, [1000, 2500][i]);//根据爆炸的是哪个飞机来决定使用哪个动画
+    }
+
+    /*游戏结束。参数：难度，得分*/
+    function gameOver(level, score) {
+        var aP = oOver.getElementsByTagName("p"),
+            honor = "萌新起飞";
+        //根据分数显示对应成就
+        if (score <= -100) {
+            honor = "苟延残喘";
+        } else if (score >= 50 && score <= 300) {
+            honor = "小试牛刀";
+        } else if (score > 300 && score <= 500) {
+            honor = "披荆斩棘";
+        } else if (score > 500 && score <= 800) {
+            honor = "过关斩将";
+        } else if (score > 800 && score <= 1000) {
+            honor = "无人能挡";
+        } else if (score > 1000 && score <= 2000) {
+            honor = "出神入化";
+        } else if (score > 2000 && score <= 3500) {
+            honor = "登峰造极";
+        } else if (score >= 5000) {
+            honor = "死神降临";
+        }
+        document.onmousemove = null;//我方飞机移动停止
+        clearInterval(oBox.fire);//射击停止
+        clearInterval(oBox.enemy);//敌机创建停止
+        oScoreBox.style.display = "none";//隐藏左上角分数
+        oOver.style.display = "block";//弹出结束菜单
+        oOver.getElementsByTagName("span")[0].innerHTML = score;//游戏得分
+        oOver.getElementsByTagName("span")[1].innerHTML = honor;//显示成就
+        for (var i = 0, length = aP.length; i < length; i++) {
+            (function (i) {
+                aP[i].onclick = function (e) {
+                    e = e || window.event;
+                    oMap.innerHTML = "<div id='biu'></div>";//清空地图
+                    oBiu = document.getElementById("biu");//子弹父级
+                    biuAll = oBiu.children;//所有子弹
+                    oOver.style.display = "none";//隐藏结束菜单
+                    cancelAnimationFrame(oMap.timer);//停止背景滚动
+                    //判断选择了重新开始还是返回菜单
+                    i ? (oMenu.style.display = "block") : startGame(level, e);
+                }
+            })(i);
+        }
+    }
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
